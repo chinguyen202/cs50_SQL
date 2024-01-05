@@ -1,25 +1,16 @@
 
 -- *** The Lost Letter ***
- -- Find the id of the address of sender
- select id from addresses where address = "900 Somerville Avenue";
- -- Find the id of the letter and get info
- select * from packages where from_address_id  = "432";
- -- Find the info of action and deliver address for the letter
- select * from scans where package_id = 384;
- -- Find the final address:
- select * from addresses where id = 854;
+ select address, type from addresses where id = ( select address_id from scans where package_id = ( select id from packages where from_address_id  = (select id from addresses where address = "900 Somerville Avenue")) AND action = "Drop");
 
 -- *** The Devious Delivery ***
--- Find the package which has no from address
-select * from packages where from_address_id is null;
--- Find the info of package from system
-select * from scans where package_id = 5098;
+-- Find the content of the packages
+SELECT packages.contents FROM packages WHERE from_address_id is null;
+-- Find the address type
+select type from addresses where id = (select address_id from packages JOIN scans ON packages.id = scans.package_id WHERE packages.from_address_id is NULL AND scans.action="Drop");
 -- *** The Forgotten Gift ***
--- Get the id of the from address
-select * from addresses where address = "728 Maple Place";
--- Get the package id
-select * from packages where from_address_id = 4983;
--- Check where is last address the package was drop
-select * from scans where package_id = 6269;
+
+-- Get the package id, content
+select contents from packages where from_address_id = (select id from addresses where address = "109 Tileston Street");
+
 -- Get the id of the address
-select * from addresses where id = 4425;
+select name from drivers WHERE id = (select driver_id from scans where package_id = (select id from packages where from_address_id = (select id from addresses where address = "109 Tileston Street")) ORDER BY scans.timestamp DESC LIMIT 1);
